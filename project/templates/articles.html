@@ -1,0 +1,92 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_tags %}
+{% load custom_filters %}
+
+<!-- Название у нас будет products -->
+{% block title %}
+Articles
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим все товары -->
+{% block content %}
+   <h1>Все товары</h1>
+   <h3>{{ time_now|date:'M d Y' }}</h3>
+   <h3>Количество Статей:</h3><h3> {{ news|length }} </h3>
+  
+    <form action="" method="get">
+    {{ filterset.form.as_p }}
+    <input type="submit" value="Найти" />
+    </form>
+  
+   <hr>
+
+
+
+   {% if articles %}
+       <table>
+           <tr>
+               <td>Название</td>
+               <td>Описание</td>
+               <td>Дата создания</td>
+               <td>Тип</td>
+               <td>Категория</td>
+               <td>ID</td>
+               {% if perms.commonapp.change_article or perms.commonapp.delete_article %}
+               <td>Действия</td>
+               {% endif %}
+           </tr>
+          
+           <!-- Для каждого товара будете генерироваться новая строчка,
+           т.е. новый HTML код, который указан в теле цикла.
+           При этом сам цикл работает точно так же, как и в Python.
+           product — переменная цикла, т.е. наш товар полученный из списка -->
+           {% for i in articles %}
+           <tr>
+               <td>{{ i.title}}</td>
+               <td>{{ i.text|truncatechars:20|censor }}</td>
+               <td>{{ i.made_at|date:'M d Y'}}</td>
+               <td>{{ i.type }}</td>
+               <td>{{ i.category.name }}</td>
+               <td>{{ i.id }}</td>
+               <td>               {% if perms.simpleapp.change_product %}
+                <a href="{% url 'article_update' pk=i.id %}">Изменить</a>
+                {% endif %}
+                {% if perms.simpleapp.delete_product %}
+                <a href="{% url 'article_delete' i.id %}">Удалить</a>
+                {% endif %}
+               </td>
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>Новостей нет!</h2>
+   {% endif %}
+
+
+   {% if page_obj.has_previous %}
+       <a href="?{% url_replacepage=1}">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?{% url_replacepage=page_obj.previous_page_number }">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {# Информация о текущей странице #}
+   {{ page_obj.number }}
+
+   {# Информация о следующих страницах #}
+   {% if page_obj.has_next %}
+       <a href="?{% url_replacepage= page_obj.next_page_number }">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?{% url_replacepage= page_obj.paginator.num_pages} ">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+
+   {% endif %}  
+
+
+  
+
+{% endblock content %}

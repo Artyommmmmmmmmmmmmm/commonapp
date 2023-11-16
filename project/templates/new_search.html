@@ -1,0 +1,14 @@
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+<h1>Новость</h1>
+<hr>
+<form action="" method="get">
+    {{ filterset.form.as_p }}
+    <button type="button">
+        <a href="{% url 'new_list' %}">Click here!</a>
+    </button>
+    <button type="submit">Click Me!</button>
+    </form>
+</form>
+{% endblock content %}
